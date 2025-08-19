@@ -647,6 +647,21 @@ public interface JsonTextReplacement extends JsonTextConverter<Tools5eIndexType>
             // {@vehicle Galley} assumes GoS by default,
             // {@vehicle Galley|UAOfShipsAndSea} can have sources added with a pipe,
             // {@vehicle Galley|GoS|and optional link text added with another pipe}.",
+
+            case monster -> {
+                String[] parts = s.split("\\|");
+                String linkText = valueOrDefault(parts, 2, parts[0]);
+                String key = index().getAliasOrDefault(
+                        type.fromTagReference(s));
+
+                JsonNode node = index().getNode(key);
+                boolean isNpc = Json2QuteMonster.isNpc(node);
+                if (!isNpc) {
+                    yield linkText;
+                } else {
+                    yield "`{@" + type.name() + ' ' + (parseState().inMarkdownTable() ? s.replaceAll("[|]", "\\\\\\\\|") : s) + "}`";
+                }
+            }
             case background,
                     feat,
                     classtype,
@@ -655,7 +670,6 @@ public interface JsonTextReplacement extends JsonTextConverter<Tools5eIndexType>
                     hazard,
                     item,
                     legendaryGroup,
-                    monster,
                     object,
                     optfeature,
                     psionic,
@@ -665,23 +679,23 @@ public interface JsonTextReplacement extends JsonTextConverter<Tools5eIndexType>
                     table,
                     tableGroup,
                     trap,
-                    vehicle ->
-                linkifyThreePart(type, s);
-            case card,
-                    deity ->
-                linkifyFourPart(type, s);
-            case action,
+                    vehicle,
+                    card,
+                    deity,
+                    action,
                     condition,
                     disease,
                     sense,
                     skill,
-                    status ->
-                linkifyRules(type, s);
-            case itemMastery, itemProperty, itemType -> linkifyItemAttribute(type, s);
-            case subclass -> linkifySubclass(s); // RARE!!
-            case classfeature -> linkifyClassFeature(s);
-            case subclassFeature -> linkifySubclassFeature(s);
-            case variantrule -> linkifyVariantRule(s);
+                    status,
+                    itemMastery,
+                    itemProperty,
+                    itemType,
+                    subclass,
+                    classfeature,
+                    subclassFeature,
+                    variantrule ->
+                "`{@" + type.name() + ' ' + (parseState().inMarkdownTable() ? s.replaceAll("[|]", "\\\\\\\\|") : s) + "}`";
             default -> {
                 tui().debugf(Msg.UNKNOWN, "unknown tag/type {@%s %s} from %s",
                         type, s, parseState().getSource());
