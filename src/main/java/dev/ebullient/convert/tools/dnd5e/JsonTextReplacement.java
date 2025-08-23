@@ -656,10 +656,11 @@ public interface JsonTextReplacement extends JsonTextConverter<Tools5eIndexType>
 
                 JsonNode node = index().getNode(key);
                 boolean isNpc = Json2QuteMonster.isNpc(node);
-                if (!isNpc) {
+                if (isNpc) {
                     yield linkText;
                 } else {
-                    yield "`{@" + type.name() + ' ' + (parseState().inMarkdownTable() ? s.replaceAll("[|]", "\\\\\\\\|") : s) + "}`";
+                    yield "`{@" + type.name() + ' ' + (parseState().inMarkdownTable() ? s.replaceAll("[|]", "\\\\\\\\|") : s)
+                            + "}`";
                 }
             }
             case background,
